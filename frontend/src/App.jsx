@@ -1,16 +1,39 @@
 // Implementation: AI generated
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import ModeSwitch from './components/ModeSwitch'
 import WordDisplay from './components/WordDisplay'
 import SentenceInput from './components/SentenceInput'
+import ProbabilitySourceSwitch from './components/ProbabilitySourceSwitch'
 import CandidateList from './components/CandidateList'
 import EntropyMeter from './components/EntropyMeter'
 import TogglePanel from './components/TogglePanel'
 import ExplanationBox from './components/ExplanationBox'
+import EvidenceWaterfall from './components/EvidenceWaterfall'
 
 const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://127.0.0.1:8000'
   : ''
+
+// Compute metrics from a probability distribution (so displayed metrics always match displayed bars)
+function entropyFromProbs(probs) {
+  let h = 0
+  for (const p of probs) {
+    if (p > 0) h -= p * Math.log2(p)
+  }
+  return Math.round(h * 10000) / 10000
+}
+
+function maxEntropy(n) {
+  return n <= 1 ? 0 : Math.round(Math.log2(n) * 10000) / 10000
+}
+
+function topConfidenceFromProbs(probs) {
+  return probs.length ? Math.max(...probs) : 0
+}
+
+function numPlausibleFromProbs(probs, threshold = 0.05) {
+  return probs.filter(p => p >= threshold).length
+}
 
 export default function App() {
   const [mode, setMode] = useState('curated')
@@ -21,6 +44,8 @@ export default function App() {
   const [contextId, setContextId] = useState(null)
   const [analysis, setAnalysis] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [probabilitySource, setProbabilitySource] = useState('model')
+  const [humanData, setHumanData] = useState(null)
 
   // Sentence mode state
   const [sentenceExampleId, setSentenceExampleId] = useState(null)
@@ -66,6 +91,54 @@ export default function App() {
       runCuratedAnalysis()
     }
   }, [currentExample, runCuratedAnalysis, mode])
+
+  // ── Human intuition data (for Human Intuition source) ──
+  useEffect(() => {
+    if (!analysis?.example_id) {
+      setHumanData(null)
+      return
+    }
+    fetch(`${API}/human_intuition/${analysis.example_id}`)
+      .then(r => r.json())
+      .then(d => {
+        const available = d.available ? d : null
+        setHumanData(available)
+        if (!available) setProbabilitySource(prev => (prev === 'human' ? 'model' : prev))
+      })
+      .catch(() => {
+        setHumanData(null)
+        setProbabilitySource(prev => (prev === 'human' ? 'model' : prev))
+      })
+  }, [analysis?.example_id])
+
+  // ── Active distribution: single source of truth for bars, order, entropy, confidence ──
+  const activeDistribution = useMemo(() => {
+    if (!analysis?.candidates?.length) return []
+    if (probabilitySource === 'human' && humanData?.human_probs) {
+      const withProbs = analysis.candidates.map(c => ({
+        ...c,
+        probability: humanData.human_probs[c.id] ?? 0,
+      }))
+      return [...withProbs].sort((a, b) => b.probability - a.probability)
+    }
+    return [...analysis.candidates].sort((a, b) => b.probability - a.probability)
+  }, [analysis, probabilitySource, humanData])
+
+  const activeProbs = useMemo(() => activeDistribution.map(c => c.probability), [activeDistribution])
+  const activeEntropy = useMemo(() => entropyFromProbs(activeProbs), [activeProbs])
+  const activeEntropyMax = useMemo(() => maxEntropy(activeProbs.length), [activeProbs.length])
+  const activeTopConfidence = useMemo(() => topConfidenceFromProbs(activeProbs), [activeProbs])
+  const activeNumPlausible = useMemo(() => numPlausibleFromProbs(activeProbs), [activeProbs])
+
+  const evidenceLabel = useMemo(() => {
+    if (probabilitySource === 'human') return 'Human first guesses'
+    if (useMorphology && useContext) return 'Prior × Morphology × Context'
+    if (useMorphology) return 'Prior × Morphology'
+    if (useContext) return 'Prior × Context'
+    return 'Prior'
+  }, [probabilitySource, useMorphology, useContext])
+
+  const baseEntropyForDelta = analysis?.stages?.orthography?.entropy ?? activeEntropy
 
   // ── Sentence mode analysis ──
   const runSentenceAnalysis = useCallback(async () => {
@@ -126,9 +199,12 @@ export default function App() {
   }
 
   const handleReset = () => {
-    setUseMorphology(false)
-    setUseContext(false)
-    setContextId(null)
+    // Reset only the model pipeline; no effect in Human Intuition mode
+    if (probabilitySource === 'model') {
+      setUseMorphology(false)
+      setUseContext(false)
+      setContextId(null)
+    }
   }
 
   const handleSentenceWordSelected = (exampleId, sentence) => {
@@ -200,16 +276,50 @@ export default function App() {
           onContextChange={handleContextToggle}
           onContextIdChange={setContextId}
           onReset={handleReset}
-          canReset={useMorphology || useContext}
+          canReset={probabilitySource === 'model' && (useMorphology || useContext)}
           sentenceMode={mode === 'sentence'}
+          disabled={probabilitySource === 'human'}
         />
       )}
 
-      {showAnalysis && <CandidateList analysis={analysis} />}
+      {showAnalysis && (
+        <ProbabilitySourceSwitch
+          source={probabilitySource}
+          onSourceChange={setProbabilitySource}
+          humanAvailable={!!humanData}
+        />
+      )}
 
-      {showAnalysis && <EntropyMeter analysis={analysis} stage={currentStage} />}
+      {showAnalysis && (
+        <CandidateList
+          activeDistribution={activeDistribution}
+          probabilitySource={probabilitySource}
+          humanData={humanData}
+        />
+      )}
 
-      {showAnalysis && <ExplanationBox analysis={analysis} stage={currentStage} />}
+      {showAnalysis && (
+        <EntropyMeter
+          entropyBits={activeEntropy}
+          entropyMax={activeEntropyMax}
+          entropyBase={baseEntropyForDelta}
+          topConfidence={activeTopConfidence}
+          numPlausible={activeNumPlausible}
+          evidenceLabel={evidenceLabel}
+          stage={currentStage}
+        />
+      )}
+
+      {showAnalysis && (
+        <ExplanationBox
+          analysis={analysis}
+          stage={currentStage}
+          probabilitySource={probabilitySource}
+          humanData={humanData}
+        />
+      )}
+
+      {showAnalysis && probabilitySource === 'model' && <EvidenceWaterfall analysis={analysis} />}
 
       <footer className="footer">
         CS109 — Probability for Computer Scientists

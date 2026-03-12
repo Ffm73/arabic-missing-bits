@@ -13,7 +13,6 @@ def get_morph_weights(candidates):
 
 
 def apply_morphology(probs, candidates):
-    # P(reading | morphology) proportional to P(reading) * P(pattern | reading)
     weights = get_morph_weights(candidates)
     return bayesian_update(probs, weights)
 

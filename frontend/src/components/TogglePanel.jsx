@@ -11,19 +11,23 @@ export default function TogglePanel({
   onReset,
   canReset,
   sentenceMode = false,
+  disabled = false,
 }) {
   return (
-    <div className="card toggle-card">
+    <div className={`card toggle-card ${disabled ? 'toggle-card-disabled' : ''}`}>
       <div className="toggle-header-row">
         <span className="toggle-section-label">Conditional probability updates</span>
-        {canReset && (
+        {canReset && !disabled && (
           <button className="reset-btn" onClick={onReset}>
             Reset
           </button>
         )}
       </div>
+      {disabled && (
+        <p className="toggle-disabled-hint">Only in Model Reasoning mode</p>
+      )}
 
-      <label className="toggle-row">
+      <label className={`toggle-row ${disabled ? 'toggle-row-disabled' : ''}`}>
         <span className="toggle-label-text" title="Bayesian update: P(reading | morphology) ∝ P(reading) × P(pattern | reading)">
           Morphology
         </span>
@@ -31,14 +35,15 @@ export default function TogglePanel({
           <input
             type="checkbox"
             checked={useMorphology}
-            onChange={(e) => onMorphologyChange(e.target.checked)}
+            onChange={(e) => !disabled && onMorphologyChange(e.target.checked)}
+            disabled={disabled}
           />
           <span className="toggle-slider" />
         </div>
         <span className="toggle-hint">P(pattern | reading)</span>
       </label>
 
-      <label className="toggle-row">
+      <label className={`toggle-row ${disabled ? 'toggle-row-disabled' : ''}`}>
         <span className="toggle-label-text" title="Bayesian update: P(reading | context) ∝ P(reading) × P(context | reading)">
           Context
         </span>
@@ -46,7 +51,8 @@ export default function TogglePanel({
           <input
             type="checkbox"
             checked={useContext}
-            onChange={(e) => onContextChange(e.target.checked)}
+            onChange={(e) => !disabled && onContextChange(e.target.checked)}
+            disabled={disabled}
           />
           <span className="toggle-slider" />
         </div>

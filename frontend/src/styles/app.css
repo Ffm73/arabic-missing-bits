@@ -129,6 +129,62 @@ body {
   color: var(--text-secondary);
 }
 
+/* ── Probability source (Human Intuition vs Model Reasoning) ── */
+
+.probability-source-switch {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.probability-source-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+.probability-source-buttons {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.probability-source-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.probability-source-btn:first-child {
+  border-right: 1px solid var(--border);
+}
+
+.probability-source-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.probability-source-btn:not(.active):not(:disabled):hover {
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+}
+
+.probability-source-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* ── Sentence Input ── */
 
 .sentence-card {
@@ -620,6 +676,16 @@ body {
   gap: 0.6rem;
 }
 
+.toggle-card-disabled {
+  opacity: 0.75;
+}
+
+.toggle-disabled-hint {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-bottom: 0;
+}
+
 .toggle-header-row {
   display: flex;
   justify-content: space-between;
@@ -659,6 +725,11 @@ body {
   gap: 0.75rem;
   cursor: pointer;
   padding: 0.3rem 0;
+}
+
+.toggle-row-disabled {
+  cursor: default;
+  opacity: 0.8;
   user-select: none;
 }
 
@@ -853,6 +924,169 @@ body {
   height: 60vh;
   color: var(--text-dim);
   font-size: 0.9rem;
+}
+
+/* ── Evidence Waterfall ── */
+
+.waterfall-card {
+  padding: 0.85rem 1.25rem;
+}
+
+.wf-header {
+  margin-bottom: 0.5rem;
+}
+
+.wf-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.wf-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.wf-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.wf-header-row {
+  margin-bottom: 0.15rem;
+}
+
+.wf-cell {
+  display: flex;
+  align-items: center;
+}
+
+.wf-reading-cell {
+  width: 110px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.wf-translit {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.wf-gloss {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.wf-stage-cell {
+  flex: 1;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.wf-val-cell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.wf-minibar-track {
+  flex: 1;
+  height: 5px;
+  background: var(--bg-raised);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.wf-minibar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width var(--transition);
+}
+
+.wf-top .wf-minibar-fill {
+  background: var(--green);
+}
+
+.wf-pct {
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  width: 30px;
+  text-align: right;
+  color: var(--text-secondary);
+}
+
+.wf-top .wf-pct {
+  color: var(--green);
+}
+
+.wf-entropy-row {
+  margin-top: 0.25rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--border);
+}
+
+.wf-entropy-val {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+}
+
+.wf-entropy-unit {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  margin-left: 0.15rem;
+}
+
+/* ── Human vs Model toggle ── */
+
+.candidates-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.human-toggle {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  font-family: inherit;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.human-toggle:hover {
+  border-color: var(--accent);
+}
+
+.human-toggle.active {
+  background: var(--green-dim);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.human-note {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
 }
 
 /* ── Responsive ── */

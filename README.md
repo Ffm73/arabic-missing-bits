@@ -1,3 +1,4 @@
+<!-- Author: Faisal Almuhaysh. Implementation: Developed with AI assistance -->
 # The Missing Bits of Arabic
 
 **CS109 — Probability for Computer Scientists — Final Challenge Project**
@@ -94,6 +95,8 @@ Morphology weights reflect documented Arabic morphological productivity — how 
 
 Context weights are hand-curated for the demo's example set. In a full system, these would come from co-occurrence statistics in a large corpus. The curated values are designed to be realistic and illustrative. All context scenarios use real Arabic sentences.
 
+The **human first-guess** layer is based on a small number of Arabic speakers' first responses (e.g. 8 per word in the included data). To estimate how stable those proportions are, the project uses **bootstrap resampling**: it repeatedly resamples the responses with replacement and recomputes the probability of each reading. The result is a 90% percentile interval for each reading (e.g. [0.40, 0.72]), shown on hover in the Human vs Model view.
+
 ### What is intentionally simple
 
 This demo is a proof-of-concept, not a production NLP system. Several design choices keep it understandable:
@@ -112,6 +115,7 @@ arabic-missing-bits/
 ├── backend/
 │   ├── main.py                  # FastAPI endpoints
 │   ├── probability_engine.py    # normalize, smooth, update (CS109-style)
+│   ├── bootstrap_human.py       # bootstrap resampling for human first-guess uncertainty
 │   ├── entropy.py               # H = -Σ p log₂ p
 │   ├── morphology.py            # morphological evidence updates
 │   ├── context_model.py         # contextual evidence updates

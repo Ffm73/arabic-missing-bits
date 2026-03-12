@@ -14,7 +14,6 @@ def get_context_weights(candidates, context):
 
 
 def apply_context(probs, candidates, context):
-    # P(reading | context) proportional to P(reading) * P(context | reading)
     if context is None:
         return probs
     weights = get_context_weights(candidates, context)

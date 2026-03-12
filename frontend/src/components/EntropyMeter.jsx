@@ -1,22 +1,22 @@
 // Implementation: AI generated
-export default function EntropyMeter({ analysis, stage }) {
-  if (!analysis) return null
+export default function EntropyMeter({
+  entropyBits,
+  entropyMax,
+  entropyBase,
+  topConfidence,
+  numPlausible,
+  evidenceLabel,
+  stage,
+}) {
+  if (entropyBits == null || entropyMax == null) return null
 
-  const { entropy_bits, entropy_max, entropy_base, num_plausible, top_confidence, stages } = analysis
-
-  const pct = entropy_max > 0 ? (entropy_bits / entropy_max) * 100 : 0
+  const pct = entropyMax > 0 ? (entropyBits / entropyMax) * 100 : 0
   const isLow = pct < 40
-  const topPct = Math.round(top_confidence * 100)
+  const topPct = Math.round((topConfidence ?? 0) * 100)
 
   let delta = null
-  if (stage !== 'orthography') {
-    delta = entropy_base - entropy_bits
-  }
-
-  const CS109_LABELS = {
-    orthography: 'Prior only',
-    morphology: 'Prior × morphology',
-    context: 'Prior × morph × context',
+  if (entropyBase != null && stage !== 'orthography' && entropyBase > entropyBits) {
+    delta = entropyBase - entropyBits
   }
 
   return (
@@ -29,11 +29,9 @@ export default function EntropyMeter({ analysis, stage }) {
           Entropy (uncertainty)
         </span>
         <span className="entropy-bits">
-          {entropy_bits.toFixed(2)} bits
-          {delta !== null && delta > 0.01 && (
-            <span className="entropy-delta">
-              (−{delta.toFixed(2)})
-            </span>
+          {entropyBits.toFixed(2)} bits
+          {delta != null && delta > 0.01 && (
+            <span className="entropy-delta">(−{delta.toFixed(2)})</span>
           )}
         </span>
       </div>
@@ -47,7 +45,7 @@ export default function EntropyMeter({ analysis, stage }) {
 
       <div className="entropy-scale">
         <span>0 — certain</span>
-        <span>{entropy_max.toFixed(2)} — max uncertainty</span>
+        <span>{entropyMax.toFixed(2)} — max uncertainty</span>
       </div>
 
       <div className="entropy-stats">
@@ -55,7 +53,7 @@ export default function EntropyMeter({ analysis, stage }) {
           <span className="entropy-stat-label" title="Readings with P ≥ 5%">
             Plausible readings
           </span>
-          <span className="entropy-stat-value plausible">{num_plausible}</span>
+          <span className="entropy-stat-value plausible">{numPlausible ?? 0}</span>
         </div>
         <div className="entropy-stat">
           <span className="entropy-stat-label" title="max(P(reading))">
@@ -65,8 +63,8 @@ export default function EntropyMeter({ analysis, stage }) {
         </div>
         <div className="entropy-stat">
           <span className="entropy-stat-label">Evidence</span>
-          <span className={`entropy-stat-value stage-tag stage-${stage}`}>
-            {CS109_LABELS[stage] || stage}
+          <span className="entropy-stat-value stage-tag">
+            {evidenceLabel}
           </span>
         </div>
       </div>

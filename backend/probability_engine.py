@@ -17,7 +17,6 @@ def normalize(probs):
 
 
 def mle_from_counts(counts):
-    # P_MLE(x) = count(x) / N
     total = sum(counts)
     if total == 0:
         return [1.0 / len(counts)] * len(counts)
@@ -28,7 +27,6 @@ def mle_from_counts(counts):
 
 
 def smooth_counts(counts, alpha=ALPHA):
-    # laplace smoothing: P(x) = (count + alpha) / (N + alpha * k)
     k = len(counts)
     total = sum(counts) + alpha * k
     result = []
@@ -45,7 +43,6 @@ def get_base_probabilities(candidates):
 
 
 def bayesian_update(probs, weights):
-    # P(reading | evidence) proportional to P(reading) * P(evidence | reading)
     updated = []
     for i in range(len(probs)):
         updated.append(probs[i] * weights[i])

@@ -17,8 +17,26 @@ const STAGE_CONFIG = {
   },
 }
 
-export default function ExplanationBox({ analysis, stage }) {
+export default function ExplanationBox({ analysis, stage, probabilitySource, humanData }) {
   if (!analysis) return null
+
+  if (probabilitySource === 'human') {
+    const n = humanData?.responses ?? 0
+    return (
+      <div className="card explanation-card stage-border-orthography">
+        <div className="explanation-stage-tag">
+          <span className="explanation-icon">👤</span>
+          <span className="explanation-stage-label">Human first guesses</span>
+        </div>
+        <p className="explanation-concept">
+          P(reading) from first-guess counts: each proportion = count / total.
+        </p>
+        <p className="explanation-text">
+          Based on {n} Arabic speakers' first guesses without context.
+        </p>
+      </div>
+    )
+  }
 
   const config = STAGE_CONFIG[stage] || STAGE_CONFIG.orthography
 

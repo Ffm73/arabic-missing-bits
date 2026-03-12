@@ -11,6 +11,7 @@ Endpoints:
 In production, also serves the built React frontend as static files.
 """
 
+import json
 import os
 import sys
 
@@ -22,6 +23,8 @@ from pydantic import BaseModel
 from typing import Optional
 
 from typing import List
+
+from bootstrap_human import compute_bootstrap_stats
 from dataset_loader import find_example, find_context, get_example_summary, get_examples
 from probability_engine import get_base_probabilities, normalize, top_confidence, num_plausible, bayesian_update
 from morphology import apply_morphology, get_morphology_explanation
@@ -332,6 +335,38 @@ def analyze_from_sentence(request: AnalyzeSentenceRequest):
         "top_confidence": round(top_confidence(probs), 4),
         "explanation": explanation,
         "stages": stages,
+    }
+
+
+# ── Human vs. Model intuition ──
+
+HUMAN_PATH = os.path.join(PROJECT_ROOT, "data", "human_intuition.json")
+
+
+def load_json_file(path):
+    if not os.path.isfile(path):
+        return None
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+@app.get("/human_intuition/{example_id}")
+def get_human_intuition(example_id: str):
+    data = load_json_file(HUMAN_PATH)
+    if data is None or example_id not in data.get("words", {}):
+        return {"available": False}
+
+    word_data = data["words"][example_id]
+    guesses = word_data["guesses"]
+    # Observed distribution (MLE) and bootstrap 90% intervals from resampling
+    human_distribution, bootstrap = compute_bootstrap_stats(guesses)
+    return {
+        "available": True,
+        "surface": word_data["surface"],
+        "responses": word_data["responses"],
+        "guesses": guesses,
+        "human_probs": word_data["human_probs"],
+        "bootstrap": bootstrap,
     }
 
 

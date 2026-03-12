@@ -1,30 +1,7 @@
 # Author: Faisal Almuhaysh
-# Implementation: Developed with AI assistance
+# Implementation: Written by author
 
-"""
-sentence_scanner.py
-
-CS109 Concept: Conditional probability estimation from observed evidence.
-
-This module estimates P(sentence pattern | reading) — the likelihood
-of observing a particular sentence structure if a given reading is
-the correct one.
-
-For example, if we observe the pattern [word] + [proper name] + [definite noun],
-that pattern is much more likely under a verb reading than a noun reading,
-because Arabic verb-subject-object sentences follow exactly this structure.
-
-Each pattern rule in the data defines:
-  - a condition to check (what tokens appear around the ambiguous word)
-  - a likelihood weight per candidate reading
-
-These likelihoods are then used in a Bayesian update:
-  P(reading | sentence) ∝ P(reading) × P(sentence pattern | reading)
-
-The rules are stored explicitly in examples.json, not hidden in code.
-This module does NOT claim to understand arbitrary Arabic — it checks
-a curated set of observable sentence patterns for the supported words.
-"""
+# Estimates P(sentence pattern | reading) from observable sentence structure; weights used in Bayesian update.
 
 import re
 from dataset_loader import get_examples
@@ -109,21 +86,11 @@ def scan_sentence(sentence):
     return detected
 
 
-# ══════════════════════════════════════════════════════════════
-# Conditional probability estimation from sentence patterns
-#
-# Each function below checks for an observable feature in the
-# sentence. These features let us estimate P(pattern | reading).
-# ══════════════════════════════════════════════════════════════
-
-# Common Arabic demonstratives
+# pattern checks for P(pattern | reading) likelihood
 DEMONSTRATIVES = {"هذا", "هذه", "ذلك", "تلك", "هؤلاء", "أولئك"}
 
-# Common Arabic prepositions and particles
 PREPOSITIONS = {"في", "من", "إلى", "على", "عن", "مع", "بين", "حتى", "منذ", "عند"}
 
-# Tokens that look like proper names: words without ال that aren't
-# common particles. This is a heuristic — not a full NER system.
 COMMON_PARTICLES = {
     "في", "من", "إلى", "على", "عن", "مع", "بين", "هو", "هي",
     "أن", "إن", "كان", "لم", "لن", "قد", "لا", "ما", "هل",
@@ -133,15 +100,10 @@ COMMON_PARTICLES = {
     "كبير", "كبيرة", "صغير", "صغيرة", "طويل", "طويلة",
 }
 
-# Common adjective endings and patterns
 ADJECTIVE_MARKERS = {"ة", "ية", "ي"}
 
 
 def looks_like_proper_name(token_text):
-    """
-    Heuristic: a token that doesn't start with ال and isn't a common
-    particle is likely a proper name or specific noun.
-    """
     normalized = normalize_for_matching(token_text)
     if normalized in COMMON_PARTICLES:
         return False

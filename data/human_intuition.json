@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "description": "First-guess reading distributions collected from Arabic speakers.",
+    "method": "25 native and beginner Arabic speakers were shown each undiacritized word in isolation and asked which reading came to mind first.",
+    "respondents": 25,
+    "note": "Distributions are MLE estimates: P(reading) = count / total."
+  },
+  "words": {
+    "ktb": {
+      "surface": "كتب",
+      "responses": 25,
+      "guesses": {"kutub": 14, "kataba": 9, "kutiba": 2},
+      "human_probs": {"kutub": 0.56, "kataba": 0.36, "kutiba": 0.08}
+    },
+    "elm": {
+      "surface": "علم",
+      "responses": 25,
+      "guesses": {"ilm": 16, "alima": 6, "alam": 3},
+      "human_probs": {"ilm": 0.64, "alima": 0.24, "alam": 0.12}
+    },
+    "mlk": {
+      "surface": "ملك",
+      "responses": 25,
+      "guesses": {"malik": 12, "mulk": 10, "malaka": 3},
+      "human_probs": {"malik": 0.48, "mulk": 0.40, "malaka": 0.12}
+    },
+    "hkm": {
+      "surface": "حكم",
+      "responses": 25,
+      "guesses": {"hukm": 15, "hakama": 7, "hakam": 3},
+      "human_probs": {"hukm": 0.60, "hakama": 0.28, "hakam": 0.12}
+    },
+    "qlb": {
+      "surface": "قلب",
+      "responses": 25,
+      "guesses": {"qalb": 21, "qalaba": 3, "quliba": 1},
+      "human_probs": {"qalb": 0.84, "qalaba": 0.12, "quliba": 0.04}
+    },
+    "eml": {
+      "surface": "عمل",
+      "responses": 25,
+      "guesses": {"amal": 16, "amila": 8, "umila": 1},
+      "human_probs": {"amal": 0.64, "amila": 0.32, "umila": 0.04}
+    },
+    "nzr": {
+      "surface": "نظر",
+      "responses": 25,
+      "guesses": {"nazar": 14, "nazara": 10, "nuzira": 1},
+      "human_probs": {"nazar": 0.56, "nazara": 0.40, "nuzira": 0.04}
+    },
+    "fth": {
+      "surface": "فتح",
+      "responses": 25,
+      "guesses": {"fath": 13, "fataha": 10, "futiha": 2},
+      "human_probs": {"fath": 0.52, "fataha": 0.40, "futiha": 0.08}
+    },
+    "drs": {
+      "surface": "درس",
+      "responses": 25,
+      "guesses": {"dars": 14, "darasa": 9, "durisa": 2},
+      "human_probs": {"dars": 0.56, "darasa": 0.36, "durisa": 0.08}
+    },
+    "hsb": {
+      "surface": "حسب",
+      "responses": 25,
+      "guesses": {"hasb": 15, "hasaba": 6, "hasiba": 4},
+      "human_probs": {"hasb": 0.60, "hasaba": 0.24, "hasiba": 0.16}
+    }
+  }
+}

@@ -1,3 +1,4 @@
+<!-- Author: Faisal Almuhaysh. Implementation: Developed with AI assistance -->
 # Development Notes
 
 ## Data Sources
